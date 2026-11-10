@@ -26,8 +26,9 @@ class App(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
         self.title(f"{APP_NAME}  {VERSION}")
-        self.geometry("580x560")
-        self.resizable(False, False)
+        self.geometry("600x640")
+        self.resizable(True, True)
+        self.minsize(560, 480)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
         if os.path.isfile(ICON_PATH):
             try:
@@ -46,8 +47,34 @@ class App(tk.Tk):
     # ---------------- UI ----------------
     def _build(self) -> None:
         pad = {"padx": 8, "pady": (2, 4)}
-        frm = ttk.Frame(self)
-        frm.pack(fill="both", expand=True, padx=12, pady=10)
+
+        # 可滚动容器：内容超高时（高分屏 / 大字体）也不裁剪按钮
+        container = ttk.Frame(self)
+        container.pack(fill="both", expand=True)
+        canvas = tk.Canvas(container, highlightthickness=0)
+        scroll = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
+        canvas.configure(yscrollcommand=scroll.set)
+        canvas.pack(side="left", fill="both", expand=True)
+        scroll.pack(side="right", fill="y")
+
+        frm = ttk.Frame(canvas)
+        win = canvas.create_window((0, 0), window=frm, anchor="nw")
+
+        def _sync_scroll(_e=None) -> None:
+            # 让内容框与画布同宽，分组框 full-width 拉伸（仅在变化时设置，避免回环）
+            cw = canvas.winfo_width()
+            if cw > 1 and frm.winfo_width() != cw:
+                canvas.itemconfig(win, width=cw)
+            canvas.configure(scrollregion=canvas.bbox("all"))
+
+        frm.bind("<Configure>", _sync_scroll)
+        canvas.bind("<Configure>", _sync_scroll)
+        # 鼠标滚轮滚动
+        self._wheel_bind = canvas.bind_all(
+            "<MouseWheel>",
+            lambda e: canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
+
+        frm.pack(padx=12, pady=10)
 
         ttk.Label(frm, text=APP_NAME, font=("Microsoft YaHei UI", 14, "bold")).pack(
             anchor="w", pady=(0, 2)
@@ -378,6 +405,10 @@ class App(tk.Tk):
             if not messagebox.askyesno("确认", "正在录制，确定退出吗？"):
                 return
             self.recorder.stop(timeout=0.5)
+        try:
+            self._wheel_bind and self.unbind_all(self._wheel_bind)
+        except (AttributeError, tk.TclError):
+            pass
         self.destroy()
 
 
