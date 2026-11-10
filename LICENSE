@@ -1,21 +1,41 @@
-MIT License
+# 软件许可协议 / Software License
 
-Copyright (c) 2026 yzo
+**o神套装-屏幕录制 (OShen Screen Recorder)**
+Copyright (C) 2026 o神套装. 保留所有权利 / All rights reserved.
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+## 中文
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+1. 本软件为作者自有原创实现，名称、版本、版权、图标、代码及资源均由本项目自行创建，
+   未使用任何第三方商业软件的代码、二进制、图标或资源。
+2. **所有已实现功能对所有人无条件免费开放使用**：无 VIP、无付费墙、无授权校验、无功能闸门、
+   无激活码、无试用限制。
+3. 你可以：**免费**将本软件用于个人、学习、非商业目的；自由查看、研究、修改源码以满足自身需求。
+4. 你**不可以**在**未经作者书面授权**的情况下：
+   - 将本软件（或其修改版）用于**商业再分发**、捆绑销售、或作为付费/增值产品的一部分；
+   - 将本项目的代码或资源**声称是你本人或他方的原创**进行发布；
+   - 移除本许可声明或版权信息。
+5. 本软件按「现状」提供，**不提供任何明示或暗示的担保**，包括但不限于对适用性、无侵权、
+   特定用途的保证；使用风险由使用者自行承担。
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+如需商业使用、集成或再分发授权，请通过项目主页与作者联系。
+
+## English
+
+1. This software is an original work created solely by the author. Its name, version,
+   copyright, icon, code, and assets are all created by this project and do **not** incorporate
+   any code, binaries, icons, or resources from any third-party commercial software.
+2. **All implemented features are free for everyone, with no conditions**: no VIP, no paywall,
+   no license check, no feature gate, no activation code, no trial limit.
+3. You may **freely** use this software for personal, educational, and non-commercial purposes,
+   and may view, study, and modify the source code for your own needs.
+4. You may **not**, without the author's prior written permission:
+   - Use this software (or modified versions) for **commercial redistribution**, bundling,
+     or as part of a paid / value-added product;
+   - Publish this project's code or assets while **claiming them as your own or any other
+     party's original** work;
+   - Remove this license notice or copyright information.
+5. This software is provided "AS IS" **without any express or implied warranty**, including but
+   not limited to warranties of merchantability, non-infringement, or fitness for a particular
+   purpose. Use is at your own risk.
+
+For commercial use, integration, or redistribution licensing, contact the author via the project page.
