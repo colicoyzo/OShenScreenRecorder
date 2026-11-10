@@ -26,9 +26,9 @@ class App(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
         self.title(f"{APP_NAME}  {VERSION}")
-        self.geometry("600x640")
+        self.geometry("820x940")
         self.resizable(True, True)
-        self.minsize(560, 480)
+        self.minsize(560, 520)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
         if os.path.isfile(ICON_PATH):
             try:
@@ -46,7 +46,7 @@ class App(tk.Tk):
 
     # ---------------- UI ----------------
     def _build(self) -> None:
-        pad = {"padx": 8, "pady": (2, 4)}
+        pad = {"padx": 8, "pady": (1, 3)}
 
         # 可滚动容器：内容超高时（高分屏 / 大字体）也不裁剪按钮
         container = ttk.Frame(self)
@@ -86,7 +86,7 @@ class App(tk.Tk):
 
         # ---- 输出 ----
         g = ttk.LabelFrame(frm, text="输出")
-        g.pack(fill="x", padx=2, pady=4)
+        g.pack(fill="x", padx=2, pady=3)
         g.columnconfigure(1, weight=1)
         ttk.Label(g, text="输出文件").grid(row=0, column=0, sticky="w", **pad)
         self.var_out = tk.StringVar(value=self._default_output())
@@ -114,7 +114,7 @@ class App(tk.Tk):
 
         # ---- 画面与质量 ----
         g = ttk.LabelFrame(frm, text="画面与质量")
-        g.pack(fill="x", padx=2, pady=4)
+        g.pack(fill="x", padx=2, pady=3)
         g.columnconfigure(1, weight=1)
         ttk.Label(g, text="帧率 (fps)").grid(row=0, column=0, sticky="w", **pad)
         self.var_fps = tk.IntVar(value=10)
@@ -131,7 +131,7 @@ class App(tk.Tk):
 
         # ---- 录制区域 ----
         g = ttk.LabelFrame(frm, text="录制区域")
-        g.pack(fill="x", padx=2, pady=4)
+        g.pack(fill="x", padx=2, pady=3)
         g.columnconfigure(1, weight=1)
         ttk.Label(g, text="区域").grid(row=0, column=0, sticky="w", **pad)
         self.var_region = tk.StringVar(value="")
@@ -146,12 +146,12 @@ class App(tk.Tk):
         ttk.Button(reg_btns, text="窗口捕获", command=self._pick_window,
                    width=10).pack(side="left", padx=2)
         ttk.Label(g, text="留空 = 全屏；可手填 x,y,w,h，或点「全屏」/「鼠标框选」/「窗口捕获」",
-                  foreground="#666666").grid(
+                  foreground="#666666", wraplength=520, justify="left").grid(
             row=2, column=0, columnspan=3, sticky="w", padx=8, pady=(2, 4))
 
         # ---- 音频 ----
         g = ttk.LabelFrame(frm, text="音频")
-        g.pack(fill="x", padx=2, pady=4)
+        g.pack(fill="x", padx=2, pady=3)
         g.columnconfigure(1, weight=1)
         self.var_audio = tk.BooleanVar(value=True)
         ttk.Checkbutton(
@@ -172,17 +172,17 @@ class App(tk.Tk):
 
         # ---- 录制控制 ----
         g = ttk.LabelFrame(frm, text="录制控制")
-        g.pack(fill="x", padx=2, pady=4)
+        g.pack(fill="x", padx=2, pady=3)
         g.columnconfigure(0, weight=1)
         btns = ttk.Frame(g)
         btns.grid(row=0, column=0, columnspan=3, pady=(4, 6))
-        self.btn_start = ttk.Button(btns, text="开始录制", command=self._start, width=14)
-        self.btn_start.pack(side="left", padx=6)
+        self.btn_start = ttk.Button(btns, text="开始录制", command=self._start, width=12)
+        self.btn_start.pack(side="left", padx=4)
         self.btn_pause = ttk.Button(btns, text="暂停", command=self._toggle_pause, width=10)
-        self.btn_pause.pack(side="left", padx=6)
-        self.btn_stop = ttk.Button(btns, text="停止录制", command=self._stop, width=14)
-        self.btn_stop.pack(side="left", padx=6)
-        ttk.Button(btns, text="关于", command=self._about, width=8).pack(side="left", padx=6)
+        self.btn_pause.pack(side="left", padx=4)
+        self.btn_stop = ttk.Button(btns, text="停止录制", command=self._stop, width=12)
+        self.btn_stop.pack(side="left", padx=4)
+        ttk.Button(btns, text="关于", command=self._about, width=8).pack(side="left", padx=4)
 
         self.var_status = tk.StringVar(value="就绪")
         ttk.Label(g, textvariable=self.var_status, foreground="#0a6").grid(
