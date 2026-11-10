@@ -50,7 +50,7 @@ Tech stack: **Python 3.9 + tkinter + Pillow + soundcard**. The AVI container is 
 
 ## Main window layout
 
-The main window (`580×560`, non-resizable) is organized into 5 titled group boxes:
+The main window (default `720×840`, resizable) is organized into 5 titled group boxes:
 
 | Group | Controls |
 | --- | --- |

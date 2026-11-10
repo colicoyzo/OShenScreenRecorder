@@ -26,9 +26,9 @@ class App(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
         self.title(f"{APP_NAME}  {VERSION}")
-        self.geometry("820x940")
+        self.geometry("720x840")
         self.resizable(True, True)
-        self.minsize(560, 520)
+        self.minsize(560, 480)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
         if os.path.isfile(ICON_PATH):
             try:
@@ -46,25 +46,29 @@ class App(tk.Tk):
 
     # ---------------- UI ----------------
     def _build(self) -> None:
-        pad = {"padx": 8, "pady": (1, 3)}
+        pad = {"padx": 8, "pady": (1, 2)}
 
         # 可滚动容器：内容超高时（高分屏 / 大字体）也不裁剪按钮
+        # 滚动条使用标准右侧布局（side="right"），不覆盖画布内容
         container = ttk.Frame(self)
         container.pack(fill="both", expand=True)
         canvas = tk.Canvas(container, highlightthickness=0)
         scroll = ttk.Scrollbar(container, orient="vertical", command=canvas.yview)
         canvas.configure(yscrollcommand=scroll.set)
-        canvas.pack(side="left", fill="both", expand=True)
+        # 标准右侧布局：滚动条占用自身宽度，不再覆盖画布内容
         scroll.pack(side="right", fill="y")
+        canvas.pack(side="left", fill="both", expand=True)
 
         frm = ttk.Frame(canvas)
         win = canvas.create_window((0, 0), window=frm, anchor="nw")
 
         def _sync_scroll(_e=None) -> None:
-            # 让内容框与画布同宽，分组框 full-width 拉伸（仅在变化时设置，避免回环）
+            # 内容框比画布窄 24px，给右侧留出余量，避免右对齐控件贴边/被滚动条遮挡
             cw = canvas.winfo_width()
-            if cw > 1 and frm.winfo_width() != cw:
-                canvas.itemconfig(win, width=cw)
+            if cw > 1:
+                target = max(1, cw - 24)
+                if frm.winfo_width() != target:
+                    canvas.itemconfig(win, width=target)
             canvas.configure(scrollregion=canvas.bbox("all"))
 
         frm.bind("<Configure>", _sync_scroll)
@@ -74,7 +78,8 @@ class App(tk.Tk):
             "<MouseWheel>",
             lambda e: canvas.yview_scroll(int(-1 * (e.delta / 120)), "units"))
 
-        frm.pack(padx=12, pady=10)
+        # 右侧留出滚动条宽度，避免内容被覆盖
+        frm.pack(padx=(12, 22), pady=10)
 
         ttk.Label(frm, text=APP_NAME, font=("Microsoft YaHei UI", 14, "bold")).pack(
             anchor="w", pady=(0, 2)
@@ -86,7 +91,7 @@ class App(tk.Tk):
 
         # ---- 输出 ----
         g = ttk.LabelFrame(frm, text="输出")
-        g.pack(fill="x", padx=2, pady=3)
+        g.pack(fill="x", padx=(2, 10), pady=2)
         g.columnconfigure(1, weight=1)
         ttk.Label(g, text="输出文件").grid(row=0, column=0, sticky="w", **pad)
         self.var_out = tk.StringVar(value=self._default_output())
@@ -96,7 +101,7 @@ class App(tk.Tk):
 
         ttk.Label(g, text="输出格式").grid(row=1, column=0, sticky="w", **pad)
         self.var_fmt = tk.StringVar(value="AVI (无损 MJPEG)")
-        fmt_box = ttk.Combobox(g, textvariable=self.var_fmt, width=16,
+        fmt_box = ttk.Combobox(g, textvariable=self.var_fmt, width=14,
                                state="readonly",
                                values=["AVI (无损 MJPEG)", "MP4 (H.264 压缩)"])
         fmt_box.grid(row=1, column=1, sticky="w", **pad)
@@ -108,13 +113,13 @@ class App(tk.Tk):
         self.var_crf = tk.IntVar(value=23)
         ttk.Scale(g, from_=18, to=30, variable=self.var_crf,
                   orient="horizontal").grid(row=2, column=1, sticky="we", **pad)
-        self.lbl_crf = ttk.Label(g, text="23 (CRF)")
+        self.lbl_crf = ttk.Label(g, text="23")
         self.lbl_crf.grid(row=2, column=2, sticky="e", **pad)
         self.var_crf.trace_add("write", self._on_crf)
 
         # ---- 画面与质量 ----
         g = ttk.LabelFrame(frm, text="画面与质量")
-        g.pack(fill="x", padx=2, pady=3)
+        g.pack(fill="x", padx=(2, 10), pady=2)
         g.columnconfigure(1, weight=1)
         ttk.Label(g, text="帧率 (fps)").grid(row=0, column=0, sticky="w", **pad)
         self.var_fps = tk.IntVar(value=10)
@@ -131,7 +136,7 @@ class App(tk.Tk):
 
         # ---- 录制区域 ----
         g = ttk.LabelFrame(frm, text="录制区域")
-        g.pack(fill="x", padx=2, pady=3)
+        g.pack(fill="x", padx=(2, 10), pady=2)
         g.columnconfigure(1, weight=1)
         ttk.Label(g, text="区域").grid(row=0, column=0, sticky="w", **pad)
         self.var_region = tk.StringVar(value="")
@@ -145,44 +150,44 @@ class App(tk.Tk):
                    width=10).pack(side="left", padx=2)
         ttk.Button(reg_btns, text="窗口捕获", command=self._pick_window,
                    width=10).pack(side="left", padx=2)
-        ttk.Label(g, text="留空 = 全屏；可手填 x,y,w,h，或点「全屏」/「鼠标框选」/「窗口捕获」",
-                  foreground="#666666", wraplength=520, justify="left").grid(
+        ttk.Label(g, text="留空=全屏；或手填 x,y,w,h，也可点按钮框选/捕获窗口",
+                  foreground="#666666", wraplength=440, justify="left").grid(
             row=2, column=0, columnspan=3, sticky="w", padx=8, pady=(2, 4))
 
         # ---- 音频 ----
         g = ttk.LabelFrame(frm, text="音频")
-        g.pack(fill="x", padx=2, pady=3)
+        g.pack(fill="x", padx=(2, 10), pady=2)
         g.columnconfigure(1, weight=1)
         self.var_audio = tk.BooleanVar(value=True)
         ttk.Checkbutton(
-            g, text="录制系统声音 (WASAPI loopback)", variable=self.var_audio
-        ).grid(row=0, column=0, columnspan=2, sticky="w", **pad)
+            g, text="录制系统声音 (WASAPI)", variable=self.var_audio
+        ).grid(row=0, column=0, columnspan=3, sticky="w", **pad)
         self.var_mic = tk.BooleanVar(value=False)
         ttk.Checkbutton(
             g, text="同时混音麦克风", variable=self.var_mic
-        ).grid(row=0, column=2, sticky="w", **pad)
+        ).grid(row=1, column=0, columnspan=3, sticky="w", **pad)
 
-        ttk.Label(g, text="麦克风音量").grid(row=1, column=0, sticky="w", **pad)
+        ttk.Label(g, text="麦克风音量").grid(row=2, column=0, sticky="w", **pad)
         self.var_mic_gain = tk.DoubleVar(value=1.0)
         ttk.Scale(g, from_=0.0, to=3.0, variable=self.var_mic_gain,
-                  orient="horizontal").grid(row=1, column=1, sticky="we", **pad)
+                  orient="horizontal").grid(row=2, column=1, sticky="we", **pad)
         self.lbl_gain = ttk.Label(g, text="1.0x")
-        self.lbl_gain.grid(row=1, column=2, sticky="e", **pad)
+        self.lbl_gain.grid(row=2, column=2, sticky="e", **pad)
         self.var_mic_gain.trace_add("write", self._on_gain)
 
         # ---- 录制控制 ----
         g = ttk.LabelFrame(frm, text="录制控制")
-        g.pack(fill="x", padx=2, pady=3)
+        g.pack(fill="x", padx=(2, 10), pady=2)
         g.columnconfigure(0, weight=1)
         btns = ttk.Frame(g)
         btns.grid(row=0, column=0, columnspan=3, pady=(4, 6))
-        self.btn_start = ttk.Button(btns, text="开始录制", command=self._start, width=12)
-        self.btn_start.pack(side="left", padx=4)
-        self.btn_pause = ttk.Button(btns, text="暂停", command=self._toggle_pause, width=10)
-        self.btn_pause.pack(side="left", padx=4)
-        self.btn_stop = ttk.Button(btns, text="停止录制", command=self._stop, width=12)
-        self.btn_stop.pack(side="left", padx=4)
-        ttk.Button(btns, text="关于", command=self._about, width=8).pack(side="left", padx=4)
+        self.btn_start = ttk.Button(btns, text="开始录制", command=self._start, width=11)
+        self.btn_start.pack(side="left", padx=3)
+        self.btn_pause = ttk.Button(btns, text="暂停", command=self._toggle_pause, width=9)
+        self.btn_pause.pack(side="left", padx=3)
+        self.btn_stop = ttk.Button(btns, text="停止录制", command=self._stop, width=11)
+        self.btn_stop.pack(side="left", padx=3)
+        ttk.Button(btns, text="关于", command=self._about, width=7).pack(side="left", padx=3)
 
         self.var_status = tk.StringVar(value="就绪")
         ttk.Label(g, textvariable=self.var_status, foreground="#0a6").grid(
@@ -220,14 +225,14 @@ class App(tk.Tk):
 
     def _on_crf(self, *_a) -> None:
         try:
-            self.lbl_crf.config(text=f"{int(self.var_crf.get())} (CRF)")
+            self.lbl_crf.config(text=str(int(self.var_crf.get())))
         except tk.TclError:
             pass
 
     def _on_format(self, *_a) -> None:
         label = self.var_fmt.get()
         fmt = fmt_code(label)
-        note = "H.264 压缩，体积小" if fmt == "mp4" else "MJPEG+PCM，无损但体积大"
+        note = "H.264 压缩·体积小" if fmt == "mp4" else "MJPEG+PCM·无损体积大"
         # 同步默认输出扩展名
         cur = self.var_out.get()
         base, _ = os.path.splitext(cur)

@@ -14,7 +14,7 @@ if not exist "%~dp0assets\app.ico" (
   "%VPY%" make_icon.py || goto :fail
 )
 echo Building onedir app ...
-"%VPY%" -m PyInstaller --noconfirm --clean --onedir --windowed --name OShenScreenRecorder --icon assets\app.ico --add-data "assets\app.ico;assets" --hidden-import PIL._tkinter_finder --hidden-import soundcard.mediafoundation --collect-all soundcard --collect-all imageio_ffmpeg main.py || goto :fail
+"%VPY%" -m PyInstaller --noconfirm --clean --onedir --windowed --name OShenScreenRecorder --icon assets\app.ico --manifest oshen.manifest --add-data "assets\app.ico;assets" --hidden-import PIL._tkinter_finder --hidden-import soundcard.mediafoundation --collect-all soundcard --collect-all imageio_ffmpeg main.py || goto :fail
 echo.
 echo Build OK: %~dp0dist\OShenScreenRecorder\OShenScreenRecorder.exe
 echo Verify:   dist\OShenScreenRecorder\OShenScreenRecorder.exe --selftest
