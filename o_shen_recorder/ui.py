@@ -26,7 +26,7 @@ class App(tk.Tk):
     def __init__(self) -> None:
         super().__init__()
         self.title(f"{APP_NAME}  {VERSION}")
-        self.geometry("560x520")
+        self.geometry("580x560")
         self.resizable(False, False)
         self.protocol("WM_DELETE_WINDOW", self._on_close)
         if os.path.isfile(ICON_PATH):
@@ -45,103 +45,110 @@ class App(tk.Tk):
 
     # ---------------- UI ----------------
     def _build(self) -> None:
-        pad = {"padx": 10, "pady": 5}
+        pad = {"padx": 8, "pady": (2, 4)}
         frm = ttk.Frame(self)
         frm.pack(fill="both", expand=True, padx=12, pady=10)
 
-        ttk.Label(frm, text=APP_NAME, font=("Microsoft YaHei UI", 14, "bold")).grid(
-            row=0, column=0, columnspan=3, sticky="w", pady=(0, 2)
+        ttk.Label(frm, text=APP_NAME, font=("Microsoft YaHei UI", 14, "bold")).pack(
+            anchor="w", pady=(0, 2)
         )
         ttk.Label(
             frm, text=f"{VERSION}   {COPYRIGHT} {COMPANY}   全部功能免费开放",
             foreground="#666666",
-        ).grid(row=1, column=0, columnspan=3, sticky="w", pady=(0, 8))
+        ).pack(anchor="w", pady=(0, 8))
 
-        # 输出文件
-        ttk.Label(frm, text="输出文件").grid(row=2, column=0, sticky="w", **pad)
+        # ---- 输出 ----
+        g = ttk.LabelFrame(frm, text="输出")
+        g.pack(fill="x", padx=2, pady=4)
+        g.columnconfigure(1, weight=1)
+        ttk.Label(g, text="输出文件").grid(row=0, column=0, sticky="w", **pad)
         self.var_out = tk.StringVar(value=self._default_output())
-        ttk.Entry(frm, textvariable=self.var_out, width=38).grid(
-            row=2, column=1, sticky="we", **pad
-        )
-        ttk.Button(frm, text="浏览…", command=self._choose_output, width=8).grid(
-            row=2, column=2, **pad
-        )
+        ttk.Entry(g, textvariable=self.var_out).grid(row=0, column=1, sticky="we", **pad)
+        ttk.Button(g, text="浏览…", command=self._choose_output, width=8).grid(
+            row=0, column=2, sticky="e", **pad)
 
-        # 帧率 / 质量
-        ttk.Label(frm, text="帧率 (fps)").grid(row=3, column=0, sticky="w", **pad)
-        self.var_fps = tk.IntVar(value=10)
-        ttk.Spinbox(frm, from_=1, to=30, textvariable=self.var_fps, width=8).grid(
-            row=3, column=1, sticky="w", **pad
-        )
-
-        ttk.Label(frm, text="JPEG 质量").grid(row=4, column=0, sticky="w", **pad)
-        self.var_quality = tk.IntVar(value=80)
-        ttk.Scale(frm, from_=30, to=95, variable=self.var_quality,
-                  orient="horizontal").grid(row=4, column=1, sticky="we", **pad)
-        self.lbl_quality = ttk.Label(frm, text="80")
-        self.lbl_quality.grid(row=4, column=2, **pad)
-        self.var_quality.trace_add("write", self._on_quality)
-
-        # 输出格式：AVI (无依赖) / MP4 (H.264 压缩)
-        ttk.Label(frm, text="输出格式").grid(row=5, column=0, sticky="w", **pad)
+        ttk.Label(g, text="输出格式").grid(row=1, column=0, sticky="w", **pad)
         self.var_fmt = tk.StringVar(value="AVI (无损 MJPEG)")
-        fmt_box = ttk.Combobox(frm, textvariable=self.var_fmt, width=16,
+        fmt_box = ttk.Combobox(g, textvariable=self.var_fmt, width=16,
                                state="readonly",
                                values=["AVI (无损 MJPEG)", "MP4 (H.264 压缩)"])
-        fmt_box.grid(row=5, column=1, sticky="w", **pad)
+        fmt_box.grid(row=1, column=1, sticky="w", **pad)
         fmt_box.bind("<<ComboboxSelected>>", self._on_format)
-        self.lbl_fmt_note = ttk.Label(frm, text="", foreground="#666666")
-        self.lbl_fmt_note.grid(row=5, column=2, sticky="w", **pad)
+        self.lbl_fmt_note = ttk.Label(g, text="", foreground="#666666")
+        self.lbl_fmt_note.grid(row=1, column=2, sticky="w", **pad)
 
-        # 选区：手动输入 + 鼠标框选 / 窗口捕获
-        ttk.Label(frm, text="录制区域").grid(row=6, column=0, sticky="w", **pad)
+        ttk.Label(g, text="MP4 画质").grid(row=2, column=0, sticky="w", **pad)
+        self.var_crf = tk.IntVar(value=23)
+        ttk.Scale(g, from_=18, to=30, variable=self.var_crf,
+                  orient="horizontal").grid(row=2, column=1, sticky="we", **pad)
+        self.lbl_crf = ttk.Label(g, text="23 (CRF)")
+        self.lbl_crf.grid(row=2, column=2, sticky="e", **pad)
+        self.var_crf.trace_add("write", self._on_crf)
+
+        # ---- 画面与质量 ----
+        g = ttk.LabelFrame(frm, text="画面与质量")
+        g.pack(fill="x", padx=2, pady=4)
+        g.columnconfigure(1, weight=1)
+        ttk.Label(g, text="帧率 (fps)").grid(row=0, column=0, sticky="w", **pad)
+        self.var_fps = tk.IntVar(value=10)
+        ttk.Spinbox(g, from_=1, to=30, textvariable=self.var_fps, width=8).grid(
+            row=0, column=1, sticky="w", **pad)
+
+        ttk.Label(g, text="JPEG 质量").grid(row=1, column=0, sticky="w", **pad)
+        self.var_quality = tk.IntVar(value=80)
+        ttk.Scale(g, from_=30, to=95, variable=self.var_quality,
+                  orient="horizontal").grid(row=1, column=1, sticky="we", **pad)
+        self.lbl_quality = ttk.Label(g, text="80")
+        self.lbl_quality.grid(row=1, column=2, sticky="e", **pad)
+        self.var_quality.trace_add("write", self._on_quality)
+
+        # ---- 录制区域 ----
+        g = ttk.LabelFrame(frm, text="录制区域")
+        g.pack(fill="x", padx=2, pady=4)
+        g.columnconfigure(1, weight=1)
+        ttk.Label(g, text="区域").grid(row=0, column=0, sticky="w", **pad)
         self.var_region = tk.StringVar(value="")
-        ttk.Entry(frm, textvariable=self.var_region, width=38).grid(
-            row=6, column=1, sticky="we", **pad
-        )
-        reg_btns = ttk.Frame(frm)
-        reg_btns.grid(row=6, column=2, **pad)
+        ttk.Entry(g, textvariable=self.var_region).grid(
+            row=0, column=1, sticky="we", **pad)
+        reg_btns = ttk.Frame(g)
+        reg_btns.grid(row=1, column=0, columnspan=3, sticky="w", pady=(2, 0))
         ttk.Button(reg_btns, text="全屏", command=self._pick_fullscreen,
-                   width=6).pack(side="left", padx=2)
+                   width=8).pack(side="left", padx=2)
         ttk.Button(reg_btns, text="鼠标框选", command=self._pick_region,
                    width=10).pack(side="left", padx=2)
         ttk.Button(reg_btns, text="窗口捕获", command=self._pick_window,
                    width=10).pack(side="left", padx=2)
-        ttk.Label(frm, text="留空 = 全屏；可手填 x,y,w,h，或点「全屏」/「鼠标框选」/「窗口捕获」",
+        ttk.Label(g, text="留空 = 全屏；可手填 x,y,w,h，或点「全屏」/「鼠标框选」/「窗口捕获」",
                   foreground="#666666").grid(
-            row=7, column=0, columnspan=3, sticky="w", padx=10
-        )
+            row=2, column=0, columnspan=3, sticky="w", padx=8, pady=(2, 4))
 
-        # 音频：系统声音 + 麦克风混音
+        # ---- 音频 ----
+        g = ttk.LabelFrame(frm, text="音频")
+        g.pack(fill="x", padx=2, pady=4)
+        g.columnconfigure(1, weight=1)
         self.var_audio = tk.BooleanVar(value=True)
         ttk.Checkbutton(
-            frm, text="录制系统声音 (WASAPI loopback)", variable=self.var_audio
-        ).grid(row=8, column=0, columnspan=2, sticky="w", **pad)
+            g, text="录制系统声音 (WASAPI loopback)", variable=self.var_audio
+        ).grid(row=0, column=0, columnspan=2, sticky="w", **pad)
         self.var_mic = tk.BooleanVar(value=False)
         ttk.Checkbutton(
-            frm, text="同时混音麦克风", variable=self.var_mic
-        ).grid(row=8, column=2, sticky="w", **pad)
+            g, text="同时混音麦克风", variable=self.var_mic
+        ).grid(row=0, column=2, sticky="w", **pad)
 
-        ttk.Label(frm, text="麦克风音量").grid(row=9, column=0, sticky="w", **pad)
+        ttk.Label(g, text="麦克风音量").grid(row=1, column=0, sticky="w", **pad)
         self.var_mic_gain = tk.DoubleVar(value=1.0)
-        ttk.Scale(frm, from_=0.0, to=3.0, variable=self.var_mic_gain,
-                  orient="horizontal").grid(row=9, column=1, sticky="we", **pad)
-        self.lbl_gain = ttk.Label(frm, text="1.0x")
-        self.lbl_gain.grid(row=9, column=2, **pad)
+        ttk.Scale(g, from_=0.0, to=3.0, variable=self.var_mic_gain,
+                  orient="horizontal").grid(row=1, column=1, sticky="we", **pad)
+        self.lbl_gain = ttk.Label(g, text="1.0x")
+        self.lbl_gain.grid(row=1, column=2, sticky="e", **pad)
         self.var_mic_gain.trace_add("write", self._on_gain)
 
-        # MP4 画质 (CRF)
-        ttk.Label(frm, text="MP4 画质").grid(row=10, column=0, sticky="w", **pad)
-        self.var_crf = tk.IntVar(value=23)
-        ttk.Scale(frm, from_=18, to=30, variable=self.var_crf,
-                  orient="horizontal").grid(row=10, column=1, sticky="we", **pad)
-        self.lbl_crf = ttk.Label(frm, text="23 (CRF)")
-        self.lbl_crf.grid(row=10, column=2, **pad)
-        self.var_crf.trace_add("write", self._on_crf)
-
-        # 按钮
-        btns = ttk.Frame(frm)
-        btns.grid(row=11, column=0, columnspan=3, pady=(12, 4))
+        # ---- 录制控制 ----
+        g = ttk.LabelFrame(frm, text="录制控制")
+        g.pack(fill="x", padx=2, pady=4)
+        g.columnconfigure(0, weight=1)
+        btns = ttk.Frame(g)
+        btns.grid(row=0, column=0, columnspan=3, pady=(4, 6))
         self.btn_start = ttk.Button(btns, text="开始录制", command=self._start, width=14)
         self.btn_start.pack(side="left", padx=6)
         self.btn_pause = ttk.Button(btns, text="暂停", command=self._toggle_pause, width=10)
@@ -150,14 +157,12 @@ class App(tk.Tk):
         self.btn_stop.pack(side="left", padx=6)
         ttk.Button(btns, text="关于", command=self._about, width=8).pack(side="left", padx=6)
 
-        # 状态
         self.var_status = tk.StringVar(value="就绪")
-        ttk.Label(frm, textvariable=self.var_status, foreground="#0a6").grid(
-            row=12, column=0, columnspan=3, sticky="w", **pad
-        )
-        self.progress = ttk.Progressbar(frm, mode="indeterminate", length=480)
-        self.progress.grid(row=13, column=0, columnspan=3, sticky="we", **pad)
-        frm.columnconfigure(1, weight=1)
+        ttk.Label(g, textvariable=self.var_status, foreground="#0a6").grid(
+            row=1, column=0, columnspan=3, sticky="w", padx=8, pady=(0, 4))
+        self.progress = ttk.Progressbar(g, mode="indeterminate")
+        self.progress.grid(row=2, column=0, columnspan=3, sticky="we", padx=8, pady=(0, 8))
+
         self._on_format()
 
     def _default_output(self) -> str:
