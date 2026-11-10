@@ -48,6 +48,20 @@ Tech stack: **Python 3.9 + tkinter + Pillow + soundcard**. The AVI container is 
 
 > Scope note: AVI is large (example: 2560×1600 / 5 fps / 5 frames with audio ≈ 1.4 MB); MP4 under the same conditions is ≈ 24 KB (very high compression). No hardware acceleration, camera, or multi-monitor stitching. Microphone mixing is off by default; MP4 requires `imageio-ffmpeg` (bundled in the build).
 
+## Main window layout
+
+The main window (`580×560`, non-resizable) is organized into 5 titled group boxes:
+
+| Group | Controls |
+| --- | --- |
+| **Output** | Output file entry + Browse button, format dropdown (AVI / MP4), format note, MP4 quality (CRF) slider |
+| **Video & quality** | Frame rate (fps) spinbox, JPEG quality slider |
+| **Recording region** | Region entry (x,y,w,h), fullscreen / drag-select / window-capture buttons, hint text |
+| **Audio** | Record system sound (WASAPI loopback) checkbox, mix microphone checkbox, mic gain slider |
+| **Recording control** | Start / Pause / Stop / About buttons, status text, progress bar |
+
+Entries and sliders stretch within their group; the window auto-minimizes on record start and restores on stop.
+
 ## Keyboard shortcuts
 
 | Action | Shortcut / Method |
@@ -145,8 +159,9 @@ validates the H.264 video track + AAC audio track. Both results are written to `
 Packaged `--selftest`: `AVI: PASS` (real capture + system sound + mic dual stream),
 `MP4: PASS` (H.264 + AAC), `OVERALL: PASS`.
 
-GUI verified to launch with the V0.5 title, original icon, fullscreen / drag-select / window-capture
-buttons, system-sound / microphone checkboxes, mic gain slider, format selector, MP4 quality (CRF),
+GUI verified to launch with the V0.5 title, original icon, 5 group boxes (Output / Video & quality /
+Recording region / Audio / Recording control), fullscreen / drag-select / window-capture buttons,
+system-sound / microphone checkboxes, mic gain slider, format selector, MP4 quality (CRF),
 pause button, and copyright info all present.
 
 ## Roadmap
